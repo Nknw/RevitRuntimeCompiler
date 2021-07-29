@@ -10,7 +10,5 @@ namespace RevitRuntimeCompiler.Editor
     {
         string EditorName { get; }
         void Edit();
-        string GetCode();
-        void Refresh();
     }
 }

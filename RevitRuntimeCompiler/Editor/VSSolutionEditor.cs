@@ -13,21 +13,8 @@ namespace RevitRuntimeCompiler.Editor
     public class VSSolutionEditor : IEditor
     {
         private Process vsProcess;
-        private readonly string _originalSolutionPath;
-        private readonly string _copySolutionPath;
-        private readonly string _codePath;
-        private readonly string _thisDir;
 
         public string EditorName => "vs";
-
-        public VSSolutionEditor()
-        {
-            _thisDir = Path.GetDirectoryName(Assembly.GetAssembly(GetType()).Location);
-            _originalSolutionPath = _thisDir + @"\EditorSolution";
-            _copySolutionPath = _originalSolutionPath + "_";
-            _codePath = _copySolutionPath + @"\Executor.cs";
-            Refresh();
-        }
 
         public void Edit()
         {
@@ -41,21 +28,6 @@ namespace RevitRuntimeCompiler.Editor
             vsProcess.StartInfo.Arguments = @$"""{_copySolutionPath + @"\EditorSolution.sln"}""";
             vsProcess.Start();
             vsProcess.Exited += (s, e) => vsProcess = null;
-        }
-
-        public string GetCode()
-        {
-            using var reader = new StreamReader( _codePath);
-            return reader.ReadToEnd();
-        }
-
-
-        public void Refresh()
-        {
-            if (Directory.Exists(_copySolutionPath))
-                Directory.Delete(_copySolutionPath, true);
-            var target = Directory.CreateDirectory(_copySolutionPath);
-            new DirectoryInfo(_originalSolutionPath).CopyFilesRecursively(target);
         }
 
         public void Dispose() => vsProcess?.Dispose();

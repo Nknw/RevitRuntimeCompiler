@@ -66,7 +66,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Channel.cs" />
-    <Compile Include="Editor\DirectoryExtensions.cs" />
+    <Compile Include="CodeProvider\ICodeProvider.cs" />
+    <Compile Include="CodeProvider\SolutionCodeProvider.cs" />
+    <Compile Include="CodeProvider\DirectoryExtensions.cs" />
     <Compile Include="Editor\IEditor.cs" />
     <Compile Include="Editor\VSSolutionEditor.cs" />
     <Compile Include="Executor\CSharpCompiler.cs" />
