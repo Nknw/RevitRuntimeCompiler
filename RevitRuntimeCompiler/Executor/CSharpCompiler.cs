@@ -12,22 +12,32 @@ namespace RevitRuntimeCompiler.Executor
     {
         private readonly CodeDomProvider _compiler;
         private readonly CompilerParameters _parameters;
-        private readonly Channel<string> _channel;
+        private readonly Channel _channel;
 
-        public CSharpCompiler(Channel<string> channel)
+        public CSharpCompiler(Channel channel)
         {
             _channel = channel;
             _compiler = CodeDomProvider.CreateProvider(CodeDomProvider.GetLanguageFromExtension("cs"));
-            var apiPath = AppDomain.CurrentDomain.GetAssemblies()
-                .Where(asm => asm.FullName.StartsWith("System") || asm.FullName.Contains("mscorelib") || asm.FullName.Split().First() == "RevitAPI")
+            var referenceAssemblies = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(ShouldCreateReference)
                 .Select(asm => asm.Location)
                 .Append(Assembly.GetAssembly(GetType()).Location)
                 .ToArray();
-            _parameters = new CompilerParameters(apiPath)
+            _parameters = new CompilerParameters(referenceAssemblies)
             {
                 GenerateInMemory = true,
                 GenerateExecutable = false
             };
+        }
+
+        private bool ShouldCreateReference(Assembly assembly)
+        {
+            var fullName = assembly.FullName;
+            var isSystem = fullName.StartsWith("System");
+            var isCore = fullName.Contains("nscorelib");
+            var name = fullName.Split(',').First();
+            var isRevitApi = name == "RevitAPI" || name == "RevitAPIUI";
+            return isSystem || isCore || isRevitApi;
         }
 
         public async Task<Assembly> CompileAsync(string code)

@@ -14,10 +14,10 @@ namespace RevitRuntimeCompiler.Executor
     public class CSharpExecutor : IExecutor
     {
         private readonly ICSharpCompiler _compiler;
-        private readonly Channel<string> _channel;
+        private readonly Channel _channel;
         private readonly Dictionary<Type, Func<UIApplication, object>> _executeFuncs = new Dictionary<Type, Func<UIApplication, object>>();
 
-        public CSharpExecutor(Channel<string> channel, ICSharpCompiler compiler)
+        public CSharpExecutor(Channel channel, ICSharpCompiler compiler)
         {
             _compiler = compiler;
             _channel = channel;
@@ -45,9 +45,9 @@ namespace RevitRuntimeCompiler.Executor
                 .First()
                 .ParameterType;
             var parameterHandler = _executeFuncs[arguement];
-            await RevitTask.RunAsync(uiApp =>
+            await RevitTask.RunAsync(async uiApp =>
             {
-                method.Invoke(null, new[] { parameterHandler(uiApp), _channel });
+                await (Task)method.Invoke(null, new[] { parameterHandler(uiApp), _channel });
             });
         }
     }
