@@ -10,27 +10,35 @@ using System.Runtime.InteropServices;
 
 namespace RevitRuntimeCompiler.Editor
 {
-    public class VSSolutionEditor : IEditor
+    public class VSEditor : IEditor
     {
         private Process vsProcess;
+        private string _openedFilePath;
 
         public string EditorName => "vs";
 
-        public void Edit()
+        public void Edit(string filepath)
         {
-            if (vsProcess != null)
+            if (vsProcess != null && _openedFilePath == filepath)
             {
                 TopWindow();
                 return;
             }
+            Close();
+            _openedFilePath = filepath;
             vsProcess = new Process();
             vsProcess.StartInfo.FileName = "devenv.exe";
-            vsProcess.StartInfo.Arguments = @$"""{_copySolutionPath + @"\EditorSolution.sln"}""";
+            vsProcess.StartInfo.Arguments = @$"""{_openedFilePath}""";
             vsProcess.Start();
             vsProcess.Exited += (s, e) => vsProcess = null;
         }
 
-        public void Dispose() => vsProcess?.Dispose();
+        public bool IsInstalled()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Close() => vsProcess?.Dispose();
 
         private void TopWindow()
         {

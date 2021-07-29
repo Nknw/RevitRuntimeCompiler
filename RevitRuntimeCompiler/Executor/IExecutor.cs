@@ -8,6 +8,7 @@ namespace RevitRuntimeCompiler.Executor
 {
     public interface IExecutor
     {
+        string Language { get; }
         Task ExecuteAsync(string code);
     }
 }

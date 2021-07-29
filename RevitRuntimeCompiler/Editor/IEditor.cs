@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace RevitRuntimeCompiler.Editor
 {
-    public interface IEditor : IDisposable
+    public interface IEditor
     {
         string EditorName { get; }
-        void Edit();
+        void Edit(string filepath);
+        bool IsInstalled();
+        void Close();
     }
 }

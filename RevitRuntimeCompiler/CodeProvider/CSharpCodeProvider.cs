@@ -9,22 +9,27 @@ using System.Reflection;
 
 namespace RevitRuntimeCompiler.CodeProvider
 {
-    public class SolutionCodeProvider : ICodeProvider
+    public class CSharpCodeProvider : ICodeProvider
     {
         private readonly string _originalSolutionPath;
         private readonly string _copySolutionPath;
         private readonly string _codePath;
         private readonly string _thisDir;
 
-        public string Location => _copySolutionPath + @"\EditorSolution.sln";
+        public string ExecutableFilePath => _copySolutionPath + @"\EditorSolution.sln";
 
-        public SolutionCodeProvider()
+        public CSharpCodeProvider(string revitVersion)
         {
             _thisDir = Path.GetDirectoryName(Assembly.GetAssembly(GetType()).Location);
             _originalSolutionPath = _thisDir + @"\EditorSolution";
             _copySolutionPath = _originalSolutionPath + "_";
             _codePath = _copySolutionPath + @"\Executor.cs";
-            Refresh();
+            PatchSolution(revitVersion);
+        }
+
+        private void PatchSolution(string revitVersion)
+        {
+
         }
 
         public string GetCode()
@@ -39,11 +44,6 @@ namespace RevitRuntimeCompiler.CodeProvider
                 Directory.Delete(_copySolutionPath, true);
             var target = Directory.CreateDirectory(_copySolutionPath);
             new DirectoryInfo(_originalSolutionPath).CopyFilesRecursively(target);
-        }
-
-        public void ConfigureEditor(IEditor editor)
-        {
-            throw new NotImplementedException();
         }
     }
 }

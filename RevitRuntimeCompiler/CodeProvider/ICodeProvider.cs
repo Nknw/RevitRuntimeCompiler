@@ -9,7 +9,7 @@ namespace RevitRuntimeCompiler.CodeProvider
 {
     public interface ICodeProvider
     {
-        string Location { get; }
+        string ExecutableFilePath { get; }
         string GetCode();
         void Refresh();
     }

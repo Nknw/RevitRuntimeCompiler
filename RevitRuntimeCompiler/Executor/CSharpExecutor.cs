@@ -17,6 +17,8 @@ namespace RevitRuntimeCompiler.Executor
         private readonly Channel _channel;
         private readonly Dictionary<Type, Func<UIApplication, object>> _executeFuncs = new Dictionary<Type, Func<UIApplication, object>>();
 
+        public string Language => "C#";
+
         public CSharpExecutor(Channel channel, ICSharpCompiler compiler)
         {
             _compiler = compiler;

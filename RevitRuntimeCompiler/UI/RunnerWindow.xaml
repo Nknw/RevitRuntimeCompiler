@@ -4,11 +4,40 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RevitRuntimeCompiler.UI"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         mc:Ignorable="d"
         Title="RunnerWindow" Height="450" Width="800"
         d:DataContext="{d:DesignInstance Type=local:RunnerViewModel,IsDesignTimeCreatable=False}">
     <Grid>
-        <DockPanel>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="9*"/>
+            <ColumnDefinition Width="388*"/>
+        </Grid.ColumnDefinitions>
+        <DockPanel Grid.ColumnSpan="2" Margin="0,0,-0.4,0">
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                <Label Content="IDE:"/>
+                <ComboBox ItemsSource="{Binding Editors}" Name="IDEBox">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction Command="{Binding ChangeEditorCommand}" CommandParameter="{Binding ElementName=IDEBox, Path=SelectedItem}"/>
+                    </i:EventTrigger>
+                </ComboBox>
+                <Label Content="Language:"/>
+                <ComboBox ItemsSource="{Binding Editors}" Name="LanguageBox">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction Command="{Binding ChangeLanguageCommand}" CommandParameter="{Binding ElementName=LanguageBox, Path=SelectedItem}"/>
+                    </i:EventTrigger>
+                </ComboBox>
+            </StackPanel>
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
                 <Button Command="{Binding EditCommand}">Edit</Button>
                 <Button Command="{Binding RefreshCommand}">Refresh</Button>
