@@ -1,0 +1,28 @@
+﻿<Window x:Class="RevitRuntimeCompiler.UI.RunnerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RevitRuntimeCompiler.UI"
+        mc:Ignorable="d"
+        Title="RunnerWindow" Height="450" Width="800"
+        d:DataContext="{d:DesignInstance Type=local:RunnerViewModel,IsDesignTimeCreatable=False}">
+    <Grid>
+        <DockPanel>
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
+                <Button Command="{Binding EditCommand}">Edit</Button>
+                <Button Command="{Binding RefreshCommand}">Refresh</Button>
+                <Button Command="{Binding RunCommand}">Run</Button>
+            </StackPanel>
+            <Grid DockPanel.Dock="Top">
+                <ListBox ItemsSource="{Binding ConsoleLines}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </DockPanel>
+    </Grid>
+</Window>
