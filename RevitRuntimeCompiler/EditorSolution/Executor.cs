@@ -5,19 +5,18 @@ using System.Text;
 using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using RevitRuntimeCompiler;
 
-namespace EditorSolution
+public static class Executor
 {
-    public static class Executor
+    //public static async Task Execute(UIApplication uIApplication, Channel channel)
+    //{
+
+    //}
+
+
+    public static async Task Execute(Document document, Channel channel)
     {
-        //public static async Task Execute(UIApplication uIApplication, Channel channel)
-        //{
 
-        //}
-
-        public static async Task Execute(Document document, Channel channel)
-        {
-
-        }
     }
 }
