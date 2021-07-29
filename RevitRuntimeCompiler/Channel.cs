@@ -13,10 +13,11 @@ namespace RevitRuntimeCompiler
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(0);
         private readonly ConcurrentQueue<TMessage> _messages = new ConcurrentQueue<TMessage>();
 
-        public void Write(TMessage message)
+        public async Task WriteAsync(TMessage message)
         {
             _messages.Enqueue(message);
             _semaphore.Release();
+            await Task.Yield();
         }
         
         public async Task<TMessage> ReadAsync()

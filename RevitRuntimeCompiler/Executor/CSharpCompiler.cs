@@ -38,7 +38,7 @@ namespace RevitRuntimeCompiler.Executor
             if (errors.Any())
             {
                 foreach (var e in errors)
-                    _channel.Write(e.ErrorText);
+                    await _channel.WriteAsync(e.ErrorText);
                 throw new Exception();
             }
             return compileResult.CompiledAssembly;

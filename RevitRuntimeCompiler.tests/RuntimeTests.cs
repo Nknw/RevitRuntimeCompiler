@@ -1,6 +1,8 @@
 ﻿using NUnit.Framework;
 using System.Threading.Tasks;
 using RevitRuntimeCompiler.Executor;
+using System.Diagnostics;
+using System;
 
 namespace RevitRuntimeCompiler.tests
 {
@@ -29,6 +31,19 @@ namespace RevitRuntimeCompiler.tests
             var result = await channel.ReadAsync();
 
             Assert.That(result, Is.EqualTo(result));
+        }
+
+        [Test]
+        public async Task ShouldRunVS()
+        {
+            using (var proc = new Process())
+            {
+                proc.StartInfo.FileName = "devenv.exe";
+                proc.StartInfo.Arguments = @"""C:\Users\Ivan\source\repos\TKBTestTask\TKBTestTask.sln""";
+                proc.Start();
+                await Task.Delay(TimeSpan.FromSeconds(20));
+            }
+
         }
     }
 }
