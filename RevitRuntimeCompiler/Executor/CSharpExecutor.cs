@@ -23,11 +23,6 @@ namespace RevitRuntimeCompiler.Executor
         {
             _compiler = compiler;
             _channel = channel;
-            InitExecutors();
-        }
-        
-        private void InitExecutors()
-        {
             _executeFuncs[typeof(UIApplication)] = uiApp => uiApp;
             _executeFuncs[typeof(Document)] = uiApp => uiApp?.ActiveUIDocument?.Document;
         }

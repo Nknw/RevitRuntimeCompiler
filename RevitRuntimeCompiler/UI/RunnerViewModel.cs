@@ -73,10 +73,6 @@ namespace RevitRuntimeCompiler.UI
                 {
                     return;
                 }
-                catch (Exception e)
-                {
-                    throw new Exception("Async void channel read exception", e);
-                }
             }
         }
 

@@ -5,29 +5,29 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.CodeDom.Compiler;
+using System.IO;
 
 namespace RevitRuntimeCompiler.Executor
 {
     public class CSharpCompiler : ICSharpCompiler
     {
         private readonly CodeDomProvider _compiler;
-        private readonly CompilerParameters _parameters;
         private readonly Channel _channel;
+        private readonly string _tempFolder;
+        private readonly string[] _referenceAssemblyPaths;
 
         public CSharpCompiler(Channel channel)
         {
+            var location = Assembly.GetAssembly(GetType()).Location;
+            _tempFolder = Path.GetDirectoryName(location) + @"\temp";
             _channel = channel;
             _compiler = CodeDomProvider.CreateProvider(CodeDomProvider.GetLanguageFromExtension("cs"));
-            var referenceAssemblies = AppDomain.CurrentDomain.GetAssemblies()
+            _referenceAssemblyPaths = AppDomain.CurrentDomain.GetAssemblies()
                 .Where(ShouldCreateReference)
                 .Select(asm => asm.Location)
-                .Append(Assembly.GetAssembly(GetType()).Location)
+                .Append(location)
                 .ToArray();
-            _parameters = new CompilerParameters(referenceAssemblies)
-            {
-                GenerateInMemory = true,
-                GenerateExecutable = false
-            };
+            TryRefreshTemp();
         }
 
         private bool ShouldCreateReference(Assembly assembly)
@@ -41,10 +41,21 @@ namespace RevitRuntimeCompiler.Executor
             return isSystem || isCore || isStandart || isRevitApi;
         }
 
+        private void TryRefreshTemp()
+        {
+            try
+            {
+                Directory.Delete(_tempFolder, true);
+            }
+            catch(Exception) { }
+            if (!Directory.Exists(_tempFolder))
+                Directory.CreateDirectory(_tempFolder);
+        }
+
         public async Task<Assembly> CompileAsync(string code)
         {
             var compileResult = await Task.Factory
-                .StartNew(() => _compiler.CompileAssemblyFromSource(_parameters, code));
+                .StartNew(() => _compiler.CompileAssemblyFromSource(CreateParameters(), code));
             var errors = compileResult.Errors.Cast<CompilerError>();
             if (errors.Any())
             {
@@ -53,6 +64,20 @@ namespace RevitRuntimeCompiler.Executor
                 throw new CompileFailedException();
             }
             return compileResult.CompiledAssembly;
+        }
+
+        private CompilerParameters CreateParameters()
+        {
+            var parameters = new CompilerParameters(_referenceAssemblyPaths)
+            {
+                GenerateExecutable = false,
+                IncludeDebugInformation = true
+            };
+            var folderName = Guid.NewGuid().ToString();
+            var folderPath = Path.Combine(_tempFolder, folderName);
+            Directory.CreateDirectory(folderPath);
+            parameters.TempFiles = new TempFileCollection(folderPath, false);
+            return parameters;
         }
     }
 }
