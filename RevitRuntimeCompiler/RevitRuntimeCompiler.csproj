@@ -79,7 +79,9 @@
     <Compile Include="Editor\VSEditor.cs" />
     <Compile Include="Executor\CompileFailedException.cs" />
     <Compile Include="Executor\CSharpCompiler.cs" />
+    <Compile Include="Executor\DotNetCompilerBase.cs" />
     <Compile Include="Executor\DotNetExecutor.cs" />
+    <Compile Include="Executor\FSharpCompiler.cs" />
     <Compile Include="Executor\IDotNetCompiler.cs" />
     <Compile Include="Executor\IExecutor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -95,6 +97,9 @@
   <ItemGroup>
     <PackageReference Include="AsyncAwaitBestPractices.MVVM">
       <Version>6.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="FSharp.Core">
+      <Version>5.0.2</Version>
     </PackageReference>
     <PackageReference Include="PropertyChanged.Fody" PrivateAssets="all">
       <Version>3.4.0</Version>
@@ -124,6 +129,18 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="EditorSolution\Properties\AssemblyInfo.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FSharpSolution\Helpers.fs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FSharpSolution\Executor.fs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FSharpSolution\FSharpSolution.fsproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FSharpSolution\FSharpSolution.sln">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Resource Include="FodyWeavers.xml" />

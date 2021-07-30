@@ -31,16 +31,11 @@ namespace RevitRuntimeCompiler.Executor
 
         public async Task ExecuteAsync(string code)
         {
-            try
+            await LogOnException(async () =>
             {
                 var compiledAssembly = await _compiler.CompileAsync(code);
                 await ExecuteAsync(compiledAssembly);
-            }
-            catch (CompileFailedException) { }
-            catch (Exception ex)
-            {
-                await LogExceptionAsync(ex);
-            }
+            });
         }
 
         private async Task ExecuteAsync(Assembly compiledAssembly)
@@ -53,8 +48,24 @@ namespace RevitRuntimeCompiler.Executor
             var parameterHandler = _executeFuncs[arguement];
             await RevitTask.RunAsync(async uiApp =>
             {
-                await (Task)method.Invoke(null, new[] { parameterHandler(uiApp), _channel });
+                await LogOnException(async () =>
+                {
+                    await (Task)method.Invoke(null, new[] { parameterHandler(uiApp), _channel });
+                });
             });
+        }
+
+        private async Task LogOnException(Func<Task> func)
+        {
+            try
+            {
+                await func();
+            }
+            catch (CompileFailedException) { }
+            catch (Exception ex)
+            {
+                await LogExceptionAsync(ex);
+            }
         }
         
         private async Task LogExceptionAsync(Exception ex)
