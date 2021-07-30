@@ -34,10 +34,11 @@ namespace RevitRuntimeCompiler.Executor
         {
             var fullName = assembly.FullName;
             var isSystem = fullName.StartsWith("System");
-            var isCore = fullName.Contains("nscorelib");
+            var isCore = fullName.Contains("mscorlib");
+            var isStandart = fullName.Contains("netstandard");
             var name = fullName.Split(',').First();
             var isRevitApi = name == "RevitAPI" || name == "RevitAPIUI";
-            return isSystem || isCore || isRevitApi;
+            return isSystem || isCore || isStandart || isRevitApi;
         }
 
         public async Task<Assembly> CompileAsync(string code)
@@ -49,7 +50,7 @@ namespace RevitRuntimeCompiler.Executor
             {
                 foreach (var e in errors)
                     await _channel.WriteAsync(e.ErrorText);
-                throw new Exception();
+                throw new CompileFailedException();
             }
             return compileResult.CompiledAssembly;
         }

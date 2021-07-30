@@ -50,6 +50,9 @@
     <LangVersion>8.0</LangVersion>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);0067</NoWarn>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -72,12 +75,14 @@
     <Compile Include="CodeProvider\DirectoryExtensions.cs" />
     <Compile Include="Editor\IEditor.cs" />
     <Compile Include="Editor\VSEditor.cs" />
+    <Compile Include="Executor\CompileFailedException.cs" />
     <Compile Include="Executor\CSharpCompiler.cs" />
     <Compile Include="Executor\CSharpExecutor.cs" />
     <Compile Include="Executor\ICSharpCompiler.cs" />
     <Compile Include="Executor\IExecutor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShowRunnerCommand.cs" />
+    <Compile Include="UI\ItemNotSelectedConverter.cs" />
     <Compile Include="UI\RelayCommand.cs" />
     <Compile Include="UI\RunnerViewModel.cs" />
     <Compile Include="UI\RunnerWindow.xaml.cs">

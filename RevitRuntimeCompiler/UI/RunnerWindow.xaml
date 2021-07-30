@@ -8,6 +8,28 @@
         mc:Ignorable="d"
         Title="RunnerWindow" Height="450" Width="800"
         d:DataContext="{d:DesignInstance Type=local:RunnerViewModel,IsDesignTimeCreatable=False}">
+    <Window.Resources>
+        <local:ItemNotSelectedConverter x:Key="notSelected"/>
+        <Style x:Key="buttonAvailability" TargetType="Button">
+            <Style.Triggers>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Value="True">
+                            <Condition.Binding>
+                                <MultiBinding Converter="{StaticResource notSelected}">
+                                    <Binding ElementName="IDEBox" Path="SelectedIndex"/>
+                                    <Binding ElementName="LanguageBox" Path="SelectedIndex"/>
+                                </MultiBinding>
+                            </Condition.Binding>
+                        </Condition>
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter Property="IsEnabled" Value="False"/>
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="9*"/>
@@ -22,26 +44,30 @@
                             <Label Content="{Binding}"/>
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
-                    <i:EventTrigger EventName="SelectionChanged">
-                        <i:InvokeCommandAction Command="{Binding ChangeEditorCommand}" CommandParameter="{Binding ElementName=IDEBox, Path=SelectedItem}"/>
-                    </i:EventTrigger>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <i:InvokeCommandAction Command="{Binding ChangeEditorCommand}" CommandParameter="{Binding ElementName=IDEBox, Path=SelectedItem}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                 </ComboBox>
                 <Label Content="Language:"/>
-                <ComboBox ItemsSource="{Binding Editors}" Name="LanguageBox">
+                <ComboBox ItemsSource="{Binding Languages}" Name="LanguageBox">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <Label Content="{Binding}"/>
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
-                    <i:EventTrigger EventName="SelectionChanged">
-                        <i:InvokeCommandAction Command="{Binding ChangeLanguageCommand}" CommandParameter="{Binding ElementName=LanguageBox, Path=SelectedItem}"/>
-                    </i:EventTrigger>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <i:InvokeCommandAction Command="{Binding ChangeLanguageCommand}" CommandParameter="{Binding ElementName=LanguageBox, Path=SelectedItem}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                 </ComboBox>
             </StackPanel>
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
-                <Button Command="{Binding EditCommand}">Edit</Button>
-                <Button Command="{Binding RefreshCommand}">Refresh</Button>
-                <Button Command="{Binding RunCommand}">Run</Button>
+                <Button Command="{Binding EditCommand}" Style="{StaticResource buttonAvailability}">Edit</Button>
+                <Button Command="{Binding RefreshCommand}" Style="{StaticResource buttonAvailability}">Refresh</Button>
+                <Button Command="{Binding RunCommand}" Style="{StaticResource buttonAvailability}">Run</Button>
             </StackPanel>
             <Grid DockPanel.Dock="Top">
                 <ListBox ItemsSource="{Binding ConsoleLines}">

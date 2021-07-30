@@ -32,12 +32,13 @@ namespace RevitRuntimeCompiler.CodeProvider
 
         private void PatchProject(string revitVersion)
         {
-            var revitPath = Registry.LocalMachine
-                .OpenSubKey(@$"SOFTWARE\Autodesk\Revit\{revitVersion}\REVIT-05:0419")
-                .GetValue("InstallationLocation");
+            var revitPath = Registry.GetValue(@$"HKEY_LOCAL_MACHINE\SOFTWARE\Autodesk\Revit\{revitVersion}\REVIT-05:0409", "InstallationLocation", null);
             var projectPath = _originalSolutionPath + @$"\{_solutionAndProjectName}.csproj";
-            using var reader = new StreamReader(projectPath);
-            var rewritedProj = string.Format(reader.ReadToEnd(), revitPath);
+            var rewritedProj = "";
+            using (var reader = new StreamReader(projectPath))
+            {
+                rewritedProj = string.Format(reader.ReadToEnd(), revitPath);
+            }
             using var writer = new StreamWriter(projectPath);
             writer.Write(rewritedProj);
         }

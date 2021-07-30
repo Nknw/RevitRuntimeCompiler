@@ -39,8 +39,8 @@ namespace RevitRuntimeCompiler.UI
         public ICommand ChangeLanguageCommand => _changeLanguageCommand ??= new RelayCommand(ChangeLanguage);
 
         public ObservableCollection<string> ConsoleLines { get; private set; }
-        public readonly List<string> Editors;
-        public readonly List<string> Languages;
+        public ObservableCollection<string> Editors { get; private set; }
+        public ObservableCollection<string> Languages { get; private set; }
 
         public RunnerViewModel(IEnumerable<IEditor> editors, 
             IEnumerable<(IExecutor,ICodeProvider)> supportedLanguages,
@@ -50,6 +50,13 @@ namespace RevitRuntimeCompiler.UI
                 .ToDictionary(e => e.EditorName);
             _supportedLanguages = supportedLanguages.ToDictionary(l => l.Item1.Language);
             _channel = channel;
+            Editors = new ObservableCollection<string>(
+                _editors.Values.Select(e => e.EditorName)
+            );
+            Languages = new ObservableCollection<string>(
+                supportedLanguages.Select(p => p.Item1.Language)
+            );
+            ConsoleLines = new ObservableCollection<string>();
             ReadChannel();
         }
 

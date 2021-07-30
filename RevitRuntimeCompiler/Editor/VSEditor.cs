@@ -31,24 +31,22 @@ namespace RevitRuntimeCompiler.Editor
             vsProcess = new Process();
             vsProcess.StartInfo.FileName = "devenv.exe";
             vsProcess.StartInfo.Arguments = @$"""{_openedFilePath}""";
+            vsProcess.EnableRaisingEvents = true;
             vsProcess.Start();
-            vsProcess.Exited += (s, e) => vsProcess = null;
+            vsProcess.Exited += (s, e) => Close();
         }
 
         public bool IsInstalled()
         {
-            Process cmd = new Process();
-            cmd.StartInfo.FileName = "cmd.exe";
-            cmd.StartInfo.RedirectStandardInput = true;
-            cmd.StartInfo.RedirectStandardOutput = true;
-            cmd.StartInfo.CreateNoWindow = true;
-            cmd.StartInfo.UseShellExecute = false;
-            cmd.Start();
-
-            cmd.StandardInput.WriteLine(@"""C:\Program Files(x86)\Microsoft Visual Studio\Installer\vswhere.exe"" -property catalog_productDisplayVersion");
-            return char.IsNumber(cmd.StandardOutput.ReadLine().First());
+            var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+            var vsWherePath = Path.Combine(programFiles, "Microsoft Visual Studio", "Installer", "vswhere.exe");
+            return File.Exists(vsWherePath);
         }
 
-        public void Close() => vsProcess?.Dispose();
+        public void Close()
+        {
+            vsProcess?.Dispose();
+            vsProcess = null;
+        }
     }
 }

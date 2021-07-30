@@ -30,7 +30,7 @@ namespace RevitRuntimeCompiler
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            if (_window?.IsActive ?? false)
+            if (_window != null)
             {
                 _window.ShowWindow();
                 return Result.Succeeded;
@@ -51,6 +51,7 @@ namespace RevitRuntimeCompiler
             _window.Show();
             _window.Closed += (s, e) =>
             {
+                _window = null;
                 _editors.ForEach(e => e.Close());
                 channel.Close();
             };

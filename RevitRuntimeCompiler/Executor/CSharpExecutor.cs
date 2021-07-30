@@ -29,14 +29,17 @@ namespace RevitRuntimeCompiler.Executor
         private void InitExecutors()
         {
             _executeFuncs[typeof(UIApplication)] = uiApp => uiApp;
-            _executeFuncs[typeof(Document)] = uiApp => uiApp.ActiveUIDocument.Document;
+            _executeFuncs[typeof(Document)] = uiApp => uiApp?.ActiveUIDocument?.Document;
         }
 
         public async Task ExecuteAsync(string code)
         {
-            var compiledAssembly = await _compiler.CompileAsync(code);
-            await ExecuteAsync(compiledAssembly);
-
+            try
+            {
+                var compiledAssembly = await _compiler.CompileAsync(code);
+                await ExecuteAsync(compiledAssembly);
+            }
+            catch (CompileFailedException) { }
         }
 
         private async Task ExecuteAsync(Assembly compiledAssembly)
@@ -49,7 +52,16 @@ namespace RevitRuntimeCompiler.Executor
             var parameterHandler = _executeFuncs[arguement];
             await RevitTask.RunAsync(async uiApp =>
             {
-                await (Task)method.Invoke(null, new[] { parameterHandler(uiApp), _channel });
+                try
+                {
+                    await (Task)method.Invoke(null, new[] { parameterHandler(uiApp), _channel });
+                }
+                catch (Exception ex)
+                {
+                    await _channel.WriteAsync(ex.GetType().FullName);
+                    await _channel.WriteAsync(ex.Message);
+                    await _channel.WriteAsync(ex.StackTrace);
+                }
             });
         }
     }

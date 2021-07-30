@@ -29,16 +29,13 @@ namespace RevitRuntimeCompiler
             try
             {
                 await _semaphore.WaitAsync(_source.Token);
+                _messages.TryDequeue(out var message);
+                return message;
             }
-            catch (AggregateException ae)
+            catch (OperationCanceledException)
             {
-                var exs = ae.InnerExceptions;
-                if (exs.Count == 1 && exs.First() is TaskCanceledException)
-                    throw new ChannelClosedException();
-                throw;
+                throw new ChannelClosedException();
             }
-            _messages.TryDequeue(out var message);
-            return message;
         }
 
         public void Close()
