@@ -15,7 +15,7 @@ namespace RevitRuntimeCompiler.UI
 {
     public class RunnerViewModel : INotifyPropertyChanged
     {
-        private Channel _channel = new Channel();
+        private readonly Channel _channel;
         private IEditor _editor;
         private IExecutor _executor;
         private ICodeProvider _provider;
@@ -43,11 +43,13 @@ namespace RevitRuntimeCompiler.UI
         public readonly List<string> Languages;
 
         public RunnerViewModel(IEnumerable<IEditor> editors, 
-            Func<Channel,IEnumerable<(IExecutor,ICodeProvider)>> languagesProvider) 
+            IEnumerable<(IExecutor,ICodeProvider)> supportedLanguages,
+            Channel channel) 
         {
             _editors = editors.Where(e => e.IsInstalled())
                 .ToDictionary(e => e.EditorName);
-            _supportedLanguages = languagesProvider(_channel).ToDictionary(l => l.Item1.Language);
+            _supportedLanguages = supportedLanguages.ToDictionary(l => l.Item1.Language);
+            _channel = channel;
             ReadChannel();
         }
 
@@ -55,8 +57,19 @@ namespace RevitRuntimeCompiler.UI
         {
             while (true)
             {
-                var message = await _channel.ReadAsync();
-                ConsoleLines.Add(message);
+                try
+                {
+                    var message = await _channel.ReadAsync();
+                    ConsoleLines.Add(message);
+                }
+                catch (ChannelClosedException)
+                {
+                    return;
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("Async void channel read exception", e);
+                }
             }
         }
 

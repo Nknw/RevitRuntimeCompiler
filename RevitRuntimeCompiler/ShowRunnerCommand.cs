@@ -17,7 +17,11 @@ namespace RevitRuntimeCompiler
     [Transaction(TransactionMode.Manual)]
     public class ShowRunnerCommand : IExternalCommand
     {
-        private static RunnerWindow window;
+        private static RunnerWindow _window;
+        private readonly static List<IEditor> _editors = new List<IEditor>()
+        {
+            new VSEditor()
+        };
 
         static ShowRunnerCommand()
         {
@@ -26,20 +30,30 @@ namespace RevitRuntimeCompiler
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            if (window?.IsActive ?? false)
+            if (_window?.IsActive ?? false)
+            {
+                _window.ShowWindow();
                 return Result.Succeeded;
+            }
             var version = commandData.Application.Application.VersionNumber;
-            window = new RunnerWindow
+            var channel = new Channel();
+            _window = new RunnerWindow
             {
                 DataContext = new RunnerViewModel(
-                        new[] { new VSEditor() },
-                        channel => new (IExecutor,ICodeProvider)[]
+                        _editors,
+                        new (IExecutor,ICodeProvider)[]
                         {
                             (new CSharpExecutor(channel, new CSharpCompiler(channel)), new CSharpCodeProvider(version))
-                        }
-                    )
+                        },
+                        channel 
+                   )
             };
-            window.Show();
+            _window.Show();
+            _window.Closed += (s, e) =>
+            {
+                _editors.ForEach(e => e.Close());
+                channel.Close();
+            };
             return Result.Succeeded;
         }
     }

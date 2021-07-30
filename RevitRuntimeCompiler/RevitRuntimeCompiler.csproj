@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Channel.cs" />
+    <Compile Include="ChannelClosedException.cs" />
     <Compile Include="CodeProvider\ICodeProvider.cs" />
     <Compile Include="CodeProvider\CSharpCodeProvider.cs" />
     <Compile Include="CodeProvider\DirectoryExtensions.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="UI\RunnerWindow.xaml.cs">
       <DependentUpon>RunnerWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WindowExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AsyncAwaitBestPractices.MVVM">

@@ -21,7 +21,9 @@ namespace RevitRuntimeCompiler.Editor
         {
             if (vsProcess != null && _openedFilePath == filepath)
             {
-                TopWindow();
+                vsProcess.WaitForInputIdle();
+                vsProcess.MainWindowHandle
+                    .ShowWindow();
                 return;
             }
             Close();
@@ -35,22 +37,18 @@ namespace RevitRuntimeCompiler.Editor
 
         public bool IsInstalled()
         {
-            throw new NotImplementedException();
+            Process cmd = new Process();
+            cmd.StartInfo.FileName = "cmd.exe";
+            cmd.StartInfo.RedirectStandardInput = true;
+            cmd.StartInfo.RedirectStandardOutput = true;
+            cmd.StartInfo.CreateNoWindow = true;
+            cmd.StartInfo.UseShellExecute = false;
+            cmd.Start();
+
+            cmd.StandardInput.WriteLine(@"""C:\Program Files(x86)\Microsoft Visual Studio\Installer\vswhere.exe"" -property catalog_productDisplayVersion");
+            return char.IsNumber(cmd.StandardOutput.ReadLine().First());
         }
 
         public void Close() => vsProcess?.Dispose();
-
-        private void TopWindow()
-        {
-            vsProcess.WaitForInputIdle();
-            ShowWindow(vsProcess.MainWindowHandle, 1);
-            SetForegroundWindow(vsProcess.MainWindowHandle);
-        }
-
-        [DllImport("user32.dll")]
-        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-        [DllImport("user32.dll")]
-        private static extern bool SetForegroundWindow(IntPtr hWnd);
     }
 }

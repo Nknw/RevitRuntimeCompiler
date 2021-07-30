@@ -9,12 +9,15 @@ namespace RevitRuntimeCompiler.Editor
 {
     internal static class DirectoryExtensions
     {
-        public static void CopyFilesRecursively(this DirectoryInfo source, DirectoryInfo target)
+        public static void CopyFilesRecursively(this DirectoryInfo source, DirectoryInfo target, Predicate<FileSystemInfo> shouldRemove = null)
         {
             foreach (DirectoryInfo dir in source.GetDirectories())
-                CopyFilesRecursively(dir, target.CreateSubdirectory(dir.Name));
+                if (shouldRemove(dir))
+                    CopyFilesRecursively(dir, target.CreateSubdirectory(dir.Name),shouldRemove);
+
             foreach (FileInfo file in source.GetFiles())
-                file.CopyTo(Path.Combine(target.FullName, file.Name));
+                if (shouldRemove(file))
+                    file.CopyTo(Path.Combine(target.FullName, file.Name));
         }
     }
 }

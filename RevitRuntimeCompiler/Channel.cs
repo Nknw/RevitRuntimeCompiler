@@ -12,6 +12,8 @@ namespace RevitRuntimeCompiler
     {
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(0);
         private readonly ConcurrentQueue<string> _messages = new ConcurrentQueue<string>();
+        private readonly CancellationTokenSource _source = new CancellationTokenSource();
+        private bool _closed;
 
         public async Task WriteAsync(string message)
         {
@@ -22,9 +24,27 @@ namespace RevitRuntimeCompiler
         
         public async Task<string> ReadAsync()
         {
-            await _semaphore.WaitAsync();
+            if (_closed)
+                throw new ChannelClosedException();
+            try
+            {
+                await _semaphore.WaitAsync(_source.Token);
+            }
+            catch (AggregateException ae)
+            {
+                var exs = ae.InnerExceptions;
+                if (exs.Count == 1 && exs.First() is TaskCanceledException)
+                    throw new ChannelClosedException();
+                throw;
+            }
             _messages.TryDequeue(out var message);
             return message;
+        }
+
+        public void Close()
+        {
+            _closed = true;
+            _source.Cancel();
         }
     }
 }
