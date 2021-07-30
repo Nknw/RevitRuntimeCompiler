@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace RevitRuntimeCompiler.Executor
 {
-    public interface ICSharpCompiler
+    public interface IDotNetCompiler
     {
         Task<Assembly> CompileAsync(string code);
     }

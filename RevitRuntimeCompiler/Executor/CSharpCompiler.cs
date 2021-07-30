@@ -9,7 +9,7 @@ using System.IO;
 
 namespace RevitRuntimeCompiler.Executor
 {
-    public class CSharpCompiler : ICSharpCompiler
+    public class CSharpCompiler : IDotNetCompiler
     {
         private readonly CodeDomProvider _compiler;
         private readonly Channel _channel;

@@ -37,15 +37,17 @@ namespace RevitRuntimeCompiler
             }
             var version = commandData.Application.Application.VersionNumber;
             var channel = new Channel();
+            var ctx = new DotNetExecuteContext("Executor", "Execute", "C#");
+            var info = new DotNetSolutionInfo("EditorSolution", "EditorSolution.csproj", "Executor.cs");
             _window = new RunnerWindow
             {
                 DataContext = new RunnerViewModel(
                         _editors,
-                        new (IExecutor,ICodeProvider)[]
+                        new (IExecutor, ICodeProvider)[]
                         {
-                            (new CSharpExecutor(channel, new CSharpCompiler(channel)), new CSharpCodeProvider(version))
+                            (new DotNetExecutor(channel, new CSharpCompiler(channel), ctx), new SolutionCodeProvider(version, info))
                         },
-                        channel 
+                        channel
                    )
             };
             _window.Show();

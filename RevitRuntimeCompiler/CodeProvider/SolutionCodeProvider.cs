@@ -10,22 +10,24 @@ using Microsoft.Win32;
 
 namespace RevitRuntimeCompiler.CodeProvider
 {
-    public class CSharpCodeProvider : ICodeProvider
+    public class SolutionCodeProvider : ICodeProvider
     {
         private readonly string _originalSolutionPath;
         private readonly string _copySolutionPath;
         private readonly string _codePath;
         private readonly string _thisDir;
         private readonly string _solutionAndProjectName = "EditorSolution";
+        private readonly DotNetSolutionInfo _solutionInfo;
 
         public string ExecutableFilePath => _copySolutionPath + @$"\{_solutionAndProjectName}.sln";
 
-        public CSharpCodeProvider(string revitVersion)
+        public SolutionCodeProvider(string revitVersion, DotNetSolutionInfo solutionInfo)
         {
+            _solutionInfo = solutionInfo;
             _thisDir = Path.GetDirectoryName(Assembly.GetAssembly(GetType()).Location);
-            _originalSolutionPath = _thisDir + @$"\{_solutionAndProjectName}";
+            _originalSolutionPath = Path.Combine(_thisDir, _solutionInfo.SolutionName);
             _copySolutionPath = _originalSolutionPath + "_";
-            _codePath = _copySolutionPath + @"\Executor.cs";
+            _codePath = Path.Combine(_copySolutionPath, _solutionInfo.CodeFileName);
             PatchProject(revitVersion);
             Refresh(false);
         }
@@ -33,7 +35,7 @@ namespace RevitRuntimeCompiler.CodeProvider
         private void PatchProject(string revitVersion)
         {
             var revitPath = Registry.GetValue(@$"HKEY_LOCAL_MACHINE\SOFTWARE\Autodesk\Revit\{revitVersion}\REVIT-05:0409", "InstallationLocation", null);
-            var projectPath = _originalSolutionPath + @$"\{_solutionAndProjectName}.csproj";
+            var projectPath = Path.Combine(_originalSolutionPath, _solutionInfo.ProjectFileName);
             var rewritedProj = "";
             using (var reader = new StreamReader(projectPath))
             {
