@@ -53,8 +53,23 @@ namespace RevitRuntimeCompiler.Executor
             var parameterHandler = _executeFuncs[arguement];
             await RevitTask.RunAsync(async uiApp =>
             {
-                await (Task)method.Invoke(null, new[] { parameterHandler(uiApp), _channel });
+                var doc = uiApp?.ActiveUIDocument?.Document;
+                var parameter = parameterHandler(uiApp);
+                if (doc == null)
+                {
+                    await Invoke(method, parameter);
+                    return;
+                }
+                using var transaction = new Transaction(doc, "Runtime compiled assembly code");
+                transaction.Start();
+                await Invoke(method, parameter);
+                transaction.Commit();
             });
+        }
+
+        private async Task Invoke(MethodInfo method, object parameter)
+        {
+            await (Task)method.Invoke(null, new[] { parameter, _channel });
         }
         
         private async Task LogExceptionAsync(Exception ex)
@@ -63,7 +78,10 @@ namespace RevitRuntimeCompiler.Executor
             await _channel.WriteAsync(ex.Message);
             await _channel.WriteAsync(ex.StackTrace);
             if (ex.InnerException != null)
+            {
+                await _channel.WriteAsync("\r\n\r\nInnerException:\r\n");
                 await LogExceptionAsync(ex.InnerException);
+            }
         }
     }
 }
